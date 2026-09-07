@@ -63,7 +63,6 @@
       margin-top: 4px;
     }
 
-    /* Month nav */
     .month-nav {
       display: flex;
       align-items: center;
@@ -101,7 +100,6 @@
       text-transform: capitalize;
     }
 
-    /* Cards */
     .card {
       background: var(--card);
       border-radius: var(--radius);
@@ -120,7 +118,6 @@
       margin-bottom: 12px;
     }
 
-    /* Salary */
     .salary-input {
       display: flex;
       align-items: center;
@@ -150,7 +147,6 @@
       border-color: var(--primary);
     }
 
-    /* Big sobra */
     .sobra-box {
       text-align: center;
       padding: 24px 16px;
@@ -159,12 +155,19 @@
       border-radius: var(--radius);
       margin-bottom: 16px;
       box-shadow: 0 8px 30px rgba(15, 118, 110, 0.3);
+      transition: background 0.25s ease, box-shadow 0.25s ease;
     }
 
     .sobra-box .label {
       font-size: 0.95rem;
       opacity: 0.9;
       margin-bottom: 4px;
+    }
+
+    .sobra-box .hint {
+      font-size: 0.75rem;
+      opacity: 0.85;
+      margin-top: 6px;
     }
 
     .sobra-box .value {
@@ -174,8 +177,18 @@
       line-height: 1.1;
     }
 
+    .sobra-box.positive {
+      background: linear-gradient(135deg, #047857, #10b981);
+      box-shadow: 0 8px 30px rgba(5, 150, 105, 0.35);
+    }
+
     .sobra-box.negative {
       background: linear-gradient(135deg, #b91c1c, #dc2626);
+      box-shadow: 0 8px 30px rgba(185, 28, 28, 0.35);
+    }
+
+    .sobra-box.neutral {
+      background: linear-gradient(135deg, #0f766e, #14b8a6);
     }
 
     .stats {
@@ -204,7 +217,6 @@
       margin-top: 2px;
     }
 
-    /* Bills list */
     .bills-header {
       display: flex;
       justify-content: space-between;
@@ -232,6 +244,13 @@
 
     .btn-add:active {
       background: var(--primary-dark);
+    }
+
+    .bills-help {
+      font-size: 0.78rem;
+      color: #0f766e;
+      opacity: 0.75;
+      margin-bottom: 8px;
     }
 
     .bill-item {
@@ -324,10 +343,6 @@
       background: #f1f5f9;
     }
 
-    .btn-icon.delete:active {
-      color: var(--danger);
-    }
-
     .empty-bills {
       text-align: center;
       padding: 24px;
@@ -335,10 +350,9 @@
       font-size: 0.9rem;
     }
 
-    /* Actions */
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 10px;
       margin-top: 8px;
     }
@@ -366,7 +380,6 @@
       margin-bottom: 2px;
     }
 
-    /* Modal */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -457,7 +470,6 @@
       background: var(--primary-dark);
     }
 
-    /* Toast */
     .toast {
       position: fixed;
       bottom: 24px;
@@ -480,19 +492,17 @@
       opacity: 1;
     }
 
-    /* Footer tip */
     .tip {
       text-align: center;
       font-size: 0.8rem;
-      color: #5eead4;
+      color: #0f766e;
       margin-top: 20px;
-      opacity: 0.9;
+      opacity: 0.75;
     }
 
-    /* Print / PDF helpers */
     @media print {
       body { background: white; }
-      .month-nav button, .btn-add, .bill-actions, .actions, .tip, .modal-overlay, .toast {
+      .month-nav button, .btn-add, .bill-actions, .actions, .tip, .modal-overlay, .toast, .bills-help {
         display: none !important;
       }
       .container { max-width: 100%; }
@@ -522,9 +532,10 @@
       </div>
     </div>
 
-    <div class="sobra-box" id="sobra-box">
+    <div class="sobra-box neutral" id="sobra-box">
       <div class="label">Quanto ainda sobra</div>
       <div class="value" id="sobra-value">R$ 0,00</div>
+      <div class="hint" id="sobra-hint">Marque as contas para descontar do salário</div>
       <div class="stats">
         <div class="stat">
           <div class="stat-label">Gastos</div>
@@ -546,10 +557,11 @@
         <div class="card-title">Contas</div>
         <button class="btn-add" id="btn-add">+ Nova conta</button>
       </div>
+      <p class="bills-help">Só o que estiver marcado entra no cálculo da sobra.</p>
       <div id="bills-list"></div>
     </div>
 
-    <div class="actions" style="grid-template-columns: 1fr 1fr;">
+    <div class="actions">
       <button class="btn-action" id="btn-whatsapp" style="grid-column: 1 / -1; background: #25D366; color: white; border-color: #25D366;">
         <span>💬</span>
         Enviar no WhatsApp
@@ -571,7 +583,6 @@
     <p class="tip">Tudo é salvo automaticamente neste aparelho</p>
   </div>
 
-  <!-- Modal -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <h3 id="modal-title">Nova conta</h3>
@@ -593,7 +604,6 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    // ========== Helpers ==========
     const MONTHS_PT = [
       "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
       "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
@@ -626,9 +636,8 @@
       return { year: y, month: m - 1 };
     }
 
-    // ========== Default bills ==========
     const DEFAULT_BILLS = [
-      { name: "Aluguel", value: 700 },
+      { name: "Aluguel", value: 0 },
       { name: "Luz", value: 0 },
       { name: "Internet", value: 0 },
       { name: "Passagem", value: 0 },
@@ -637,14 +646,12 @@
       { name: "Escola", value: 0 }
     ];
 
-    // ========== State ==========
     let currentYear, currentMonth;
-    let data = {}; // { "2026-09": { salary: number, bills: [...] } }
+    let data = {};
     let editingId = null;
 
     const STORAGE_KEY = "sobra_data_v1";
 
-    // ========== Persistence ==========
     function loadData() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -664,13 +671,9 @@
 
     function getMonthData(key) {
       if (!data[key]) {
-        // Create new month
-        // Try to copy from previous month
         const { year, month } = parseMonthKey(key);
-        let prevKey = null;
         let prevBills = null;
 
-        // Look for nearest previous month with data
         for (let i = 1; i <= 24; i++) {
           let m = month - i;
           let y = year;
@@ -701,45 +704,59 @@
       return data[key];
     }
 
-    // ========== UI ==========
+    function calcMonth(md) {
+      const salary = Number(md.salary) || 0;
+      const totalGastos = md.bills.reduce((s, b) => s + (Number(b.value) || 0), 0);
+      const totalPago = md.bills.filter(b => b.paid).reduce((s, b) => s + (Number(b.value) || 0), 0);
+      const totalAPagar = totalGastos - totalPago;
+      const sobra = salary - totalPago;
+      return { salary, totalGastos, totalPago, totalAPagar, sobra };
+    }
+
     function render() {
       const key = monthKey(currentYear, currentMonth);
       const md = getMonthData(key);
 
-      // Month label
       document.getElementById("month-label").textContent =
         `${MONTHS_PT[currentMonth]} ${currentYear}`;
 
-      // Salary
       const salaryInput = document.getElementById("salary");
       if (document.activeElement !== salaryInput) {
         salaryInput.value = md.salary ? md.salary : "";
       }
 
-      // Calculations
-      const totalGastos = md.bills.reduce((s, b) => s + (Number(b.value) || 0), 0);
-      const totalPago = md.bills.filter(b => b.paid).reduce((s, b) => s + (Number(b.value) || 0), 0);
-      const totalAPagar = totalGastos - totalPago;
-      const sobra = (Number(md.salary) || 0) - totalGastos;
+      const { salary, totalGastos, totalPago, totalAPagar, sobra } = calcMonth(md);
 
-      // Sobra box
       const sobraBox = document.getElementById("sobra-box");
       const sobraEl = document.getElementById("sobra-value");
+      const hintEl = document.getElementById("sobra-hint");
       sobraEl.textContent = formatBRL(sobra);
-      sobraBox.classList.toggle("negative", sobra < 0);
+
+      sobraBox.classList.remove("positive", "negative", "neutral");
+      if (sobra > 0) {
+        sobraBox.classList.add("positive");
+        hintEl.textContent = "Sobra positiva — ainda tem mais que o gasto marcado";
+      } else if (sobra < 0) {
+        sobraBox.classList.add("negative");
+        hintEl.textContent = "Valor negativo — os gastos marcados passaram do salário";
+      } else {
+        sobraBox.classList.add("neutral");
+        hintEl.textContent = salary === 0 && totalPago === 0
+          ? "Informe o salário e marque as contas pagas"
+          : "Zerado em relação ao salário";
+      }
 
       document.getElementById("stat-gastos").textContent = formatBRL(totalGastos);
       document.getElementById("stat-pago").textContent = formatBRL(totalPago);
       document.getElementById("stat-apagar").textContent = formatBRL(totalAPagar);
 
-      // Bills list
       const list = document.getElementById("bills-list");
       if (!md.bills.length) {
         list.innerHTML = `<div class="empty-bills">Nenhuma conta. Clique em + Nova conta</div>`;
       } else {
         list.innerHTML = md.bills.map(b => `
           <div class="bill-item ${b.paid ? "paid" : ""}" data-id="${b.id}">
-            <div class="checkbox ${b.paid ? "checked" : ""}" data-action="toggle" title="Marcar pago"></div>
+            <div class="checkbox ${b.paid ? "checked" : ""}" data-action="toggle" title="Marcar como pago"></div>
             <div class="bill-info">
               <div class="bill-name">${escapeHtml(b.name)}</div>
             </div>
@@ -761,9 +778,7 @@
         .replace(/"/g, "&quot;");
     }
 
-    // ========== Events ==========
     function setupEvents() {
-      // Month navigation
       document.getElementById("btn-prev").addEventListener("click", () => {
         currentMonth--;
         if (currentMonth < 0) {
@@ -782,7 +797,6 @@
         render();
       });
 
-      // Salary
       const salaryInput = document.getElementById("salary");
       salaryInput.addEventListener("input", () => {
         const key = monthKey(currentYear, currentMonth);
@@ -792,7 +806,6 @@
         render();
       });
 
-      // Bills list clicks
       document.getElementById("bills-list").addEventListener("click", (e) => {
         const item = e.target.closest(".bill-item");
         if (!item) return;
@@ -821,17 +834,13 @@
         }
       });
 
-      // Add bill
       document.getElementById("btn-add").addEventListener("click", () => openModal(null));
-
-      // Modal
       document.getElementById("btn-cancel").addEventListener("click", closeModal);
       document.getElementById("btn-save").addEventListener("click", saveModal);
       document.getElementById("modal").addEventListener("click", (e) => {
         if (e.target.id === "modal") closeModal();
       });
 
-      // Enter key in modal
       document.getElementById("input-name").addEventListener("keydown", (e) => {
         if (e.key === "Enter") document.getElementById("input-value").focus();
       });
@@ -839,14 +848,12 @@
         if (e.key === "Enter") saveModal();
       });
 
-      // Exports
       document.getElementById("btn-lista").addEventListener("click", downloadLista);
       document.getElementById("btn-planilha").addEventListener("click", downloadPlanilha);
       document.getElementById("btn-pdf").addEventListener("click", savePDF);
       document.getElementById("btn-whatsapp").addEventListener("click", sendWhatsApp);
     }
 
-    // ========== Modal ==========
     function openModal(bill) {
       editingId = bill ? bill.id : null;
       document.getElementById("modal-title").textContent = bill ? "Editar conta" : "Nova conta";
@@ -894,15 +901,10 @@
       showToast(editingId ? "Conta atualizada" : "Conta adicionada");
     }
 
-    // ========== Exports ==========
     function getCurrentSummary() {
       const key = monthKey(currentYear, currentMonth);
       const md = getMonthData(key);
-      const totalGastos = md.bills.reduce((s, b) => s + (Number(b.value) || 0), 0);
-      const totalPago = md.bills.filter(b => b.paid).reduce((s, b) => s + (Number(b.value) || 0), 0);
-      const totalAPagar = totalGastos - totalPago;
-      const sobra = (Number(md.salary) || 0) - totalGastos;
-      return { key, md, totalGastos, totalPago, totalAPagar, sobra };
+      return { key, md, ...calcMonth(md) };
     }
 
     function downloadLista() {
@@ -921,14 +923,13 @@
       const { md, totalGastos, totalPago, totalAPagar, sobra } = getCurrentSummary();
       const monthName = `${MONTHS_PT[currentMonth]} ${currentYear}`;
 
-      // CSV with BOM for Excel compatibility
       let csv = "\uFEFF";
       csv += `Sobra - ${monthName}\n`;
       csv += `Salário;${formatNumber(md.salary)}\n`;
       csv += `Gastos;${formatNumber(totalGastos)}\n`;
       csv += `Já pago;${formatNumber(totalPago)}\n`;
       csv += `A pagar;${formatNumber(totalAPagar)}\n`;
-      csv += `Sobra;${formatNumber(sobra)}\n\n`;
+      csv += `Sobra (salário − pagos);${formatNumber(sobra)}\n\n`;
       csv += `Nome;Valor;Status\n`;
 
       md.bills.forEach(b => {
@@ -946,7 +947,6 @@
     }
 
     function savePDF() {
-      // Use browser print → user can save as PDF
       showToast("Use a opção 'Salvar como PDF' na impressão");
       setTimeout(() => window.print(), 400);
     }
@@ -975,11 +975,8 @@
     function sendWhatsApp() {
       const text = buildShareText();
       const encoded = encodeURIComponent(text);
-
-      // api.whatsapp.com funciona melhor em celulares
       const url = "https://api.whatsapp.com/send?text=" + encoded;
 
-      // Tenta abrir o WhatsApp
       const a = document.createElement("a");
       a.setAttribute("href", url);
       a.setAttribute("target", "_blank");
@@ -988,7 +985,6 @@
       a.click();
       document.body.removeChild(a);
 
-      // Também copia o texto para a área de transferência (caso o WhatsApp não abra)
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
           showToast("Texto copiado! Cole no WhatsApp");
@@ -1000,7 +996,6 @@
       }
     }
 
-    // ========== Toast ==========
     let toastTimer;
     function showToast(msg) {
       const t = document.getElementById("toast");
@@ -1010,7 +1005,6 @@
       toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
     }
 
-    // ========== Init ==========
     function init() {
       loadData();
       const now = new Date();
