@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ff2d55" />
+  <title>Sobra - controle financeiro R$ 9,99</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #0b1220;
+      color: #fff;
+      min-height: 100vh;
+      padding: 14px 14px 56px;
+    }
+    .wrap { max-width: 460px; margin: 0 auto; }
+    .badge { display:inline-block; background:#ffb703; color:#111; font-weight:900; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; padding:6px 10px; border-radius:999px; }
+    h1 { font-size:2rem; line-height:1.1; font-weight:900; margin:12px 0 8px; }
+    h1 em { color:#ffb703; font-style:normal; }
+    .lead { color:#ffe8c2; font-size:1.05rem; margin-bottom:14px; }
+    .words { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 14px; }
+    .chip { background:#1f2937; border:1px solid #fbbf24; color:#fde68a; font-weight:800; font-size:.78rem; padding:6px 10px; border-radius:999px; }
+    .chip.hot { background:#ff2d55; color:#fff; border-color:#ff2d55; }
+    .chip.ok { background:#00c853; color:#042; border-color:#00c853; }
+    .price-card { background:linear-gradient(145deg,#ff2d55,#ff7a18); border-radius:24px; padding:22px 18px; text-align:center; }
+    .price-card .k { font-weight:800; text-transform:uppercase; letter-spacing:.12em; font-size:.75rem; }
+    .price { font-size:3.2rem; font-weight:900; line-height:1; }
+    .price small { font-size:1.15rem; }
+    .price-card p { margin-top:8px; font-weight:700; }
+    .btn { display:block; text-align:center; text-decoration:none; border:none; border-radius:16px; padding:14px 12px; font-weight:900; font-size:.95rem; color:#081016; }
+    .btn-wa { background:#25d366; color:#052; margin-top:14px; }
+    .btn-copy { background:#fff; width:100%; margin-top:8px; color:#081016; }
+    .card { background:#111827; border:2px solid #334155; border-radius:20px; padding:16px; margin-top:12px; }
+    .card h2 { font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:#ffb703; margin-bottom:10px; }
+    .qr { width:220px; height:220px; display:block; margin:10px auto; background:#fff; border-radius:16px; padding:8px; }
+    .preview-wrap { margin-top:18px; }
+    .preview-wrap h2 { color:#ffb703; font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+    .phone { background:#e7fbf6; border-radius:28px; padding:14px 12px 18px; color:#134e4a; }
+    .phone .app-title { text-align:center; color:#0f766e; font-weight:900; font-size:1.6rem; }
+    .phone .app-sub { text-align:center; color:#0f766e; opacity:.75; font-size:.82rem; margin-bottom:10px; }
+    .phone .mnav { display:flex; justify-content:space-between; align-items:center; background:#fff; border-radius:16px; padding:8px 10px; margin-bottom:8px; }
+    .phone .dot { width:28px; height:28px; border-radius:50%; background:#ccfbf1; color:#0f766e; display:flex; align-items:center; justify-content:center; font-weight:800; }
+    .phone .sal { background:#fff; border-radius:16px; padding:10px 12px; margin-bottom:8px; }
+    .phone .sal span { font-size:.65rem; font-weight:800; color:#0f766e; }
+    .phone .sal .box { margin-top:6px; background:#f0fdfa; border:2px solid #99f6e4; border-radius:10px; padding:8px; font-weight:800; color:#94a3b8; }
+    .phone .sobra { background:linear-gradient(135deg,#0f766e,#14b8a6); color:#fff; border-radius:16px; padding:16px 10px; text-align:center; margin-bottom:8px; }
+    .phone .sobra .val { font-size:2rem; font-weight:900; }
+    .phone .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:10px; }
+    .phone .st { background:rgba(255,255,255,.18); border-radius:10px; padding:6px 4px; font-size:.62rem; }
+    .phone .st b { display:block; font-size:.78rem; margin-top:2px; }
+    .phone .bills { background:#fff; border-radius:16px; padding:10px 12px; }
+    .phone .bh { display:flex; justify-content:space-between; align-items:center; font-size:.72rem; font-weight:800; color:#0f766e; margin-bottom:8px; }
+    .phone .add { background:#0f766e; color:#fff; border-radius:8px; padding:4px 8px; font-size:.68rem; }
+    .phone .row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e0f2f1; font-weight:700; font-size:.88rem; }
+    .phone .sq { width:16px; height:16px; border:2px solid #0f766e; border-radius:4px; display:inline-block; margin-right:8px; vertical-align:middle; }
+    .caption { text-align:center; color:#fde68a; font-weight:700; margin-top:10px; font-size:.9rem; }
+    .access { margin-top:16px; background:#111827; border:2px solid #ffe566; border-radius:20px; padding:16px; text-align:center; }
+    .access p { color:#ffe8c2; margin-bottom:12px; font-weight:700; }
+    .shot {
+      margin-top:10px; max-height:520px; overflow-y:auto; -webkit-overflow-scrolling:touch;
+      border-radius:18px; border:3px solid #0f766e; background:#e7fbf6;
+    }
+    .info h3 { color:#ffb703; font-size:1.15rem; margin:16px 0 8px; }
+    .info p { color:#f4e6c4; font-size:1.02rem; line-height:1.55; margin-bottom:12px; }
+    .tabs { display:flex; gap:6px; margin-bottom:8px; }
+    .tab { flex:1; border:none; border-radius:999px; padding:8px; font-weight:800; font-size:.75rem; background:#1f2937; color:#fde68a; }
+    .tab.on { background:#ff2d55; color:#fff; }
+    textarea { width:100%; min-height:120px; border-radius:12px; border:2px solid #fbbf24; background:#0b1220; color:#fff; padding:10px; font:inherit; font-size:.9rem; }
+    .toast { position:fixed; left:50%; bottom:20px; transform:translateX(-50%) translateY(70px); background:#00e676; color:#042; font-weight:900; padding:10px 16px; border-radius:12px; opacity:0; transition:.25s; z-index:20; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .note { margin-top:10px; font-size:.85rem; color:#fde68a; font-weight:700; }
+    .wa { background:#0b141a; border-radius:16px; padding:12px 10px; margin-top:10px; text-align:left; }
+    .wa .head { color:#8696a0; font-size:.72rem; font-weight:800; margin-bottom:8px; letter-spacing:.04em; text-transform:uppercase; }
+    .bubble { background:#005c4b; color:#fff; border-radius:12px 12px 4px 12px; padding:9px 11px; margin:8px 0 8px 18%; font-size:.88rem; line-height:1.35; font-weight:650; }
+    .bubble.left { background:#202c33; margin:8px 18% 8px 0; border-radius:12px 12px 12px 4px; }
+    .bubble small { display:block; color:#aebac1; font-size:.68rem; margin-top:4px; font-weight:600; }
+    .phrase { background:#1f2937; border-left:4px solid #ffb703; padding:10px 12px; margin:8px 0; border-radius:0 12px 12px 0; font-weight:700; color:#fff7ed; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <span class="badge">organizacao financeira no celular</span>
+    <h1>Pare de terminar o mes <em>no vermelho</em> sem saber por que.</h1>
+    <p class="lead">Salario no comeco. Contas no meio. Aperto no fim. O Sobra coloca o mes no papel: o que entrou, o que saiu e o que ainda da para gastar.</p>
+    <div class="words">
+      <span class="chip hot">NO VERMELHO?</span>
+      <span class="chip ok">SOBROU</span>
+      <span class="chip">CONTROLE DO SALARIO</span>
+      <span class="chip">ORGANIZE O MES</span>
+    </div>
+
+    <div class="price-card">
+      <div class="k">pagamento unico · sem mensalidade</div>
+      <div class="price"><small>R$</small> 9,99</div>
+      <p>Pague pelo QR Pix e fale no WhatsApp para receber o link do app.</p>
+      <a class="btn btn-wa" href="https://wa.me/5521974747824?text=Ola!%20Quero%20mais%20informacoes%20sobre%20o%20Sobra.">Clique aqui para mais informacoes</a>
+    </div>
+
+    <div class="card">
+      <h2>Pague R$ 9,99 neste QR Pix</h2>
+      <img class="qr" alt="QR Pix R$ 9,99" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeAAAAHgAQMAAABHGizWAAAABlBMVEX///8RERFxTxnbAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAC2ElEQVR4nO3cMZKrMAyAYWVeQZkj5CgcDY6Wo3CELVO8iR5Isi3nkczsBLpfRZbEfGylkZENIt/EpC3+xi/yRx/rwaj6XP9c9S7Tc/1NdelOf4LB4F38LPl1WfHVxuOHcTsY1rPu7aw6KAIGg9/iwRJsvkRKruHpF/jHc7OkpB1sFwSDwafjqx3WKrnm+KNUSSnJDgaDf4NFbjqLZeKWkhY/69dcJcFg8Lk4ouTzLOtH3A46Hv2C3ax2d9YLBoP1tclSC+FjzU3LOp97zu1esQUYDD4ev8bNr+KNmcARG/4cYDBYpOXYmnVxIPZn8dvBVCV9YmpXjg4MGAw+HJeUnbbWph2UKmnRdWi26PIZDAbvYNXoo3RzT7WKWOee2q2pa5fPYDD4QPz/aoPFUKqkD0a5vK2fLdmfYDB4F4t4/csLfFtYk8XjnpuiFYuAweDDcZ64Sh5PMfq9Yq2l3r4Bg8FvsN/xWfiyec3UUXNKFixeQgUMBp+Ea2szPX5QF/i6iL5n/RdgMHgfbxVxzBuhte5kadvCtNs8pmAw+ER89Xlod6Jdpc5qPeujSkpJdjAYvIOttWnhy+ZLmV5quaA1RdsF6+YxN2Aw+FAcjZm7r7nX8CoZWLty6bNarU+bg8HgHkvZAmbRFcLUbZkltrlY1CYLGAw+Gk/VlAfK0+2gSExcXxf4BAwGv8de/8a8bB7zzDEtKzxbSpZHW8Fg8Dl4aEsRPt7y+RIHMXhrO1nAYPAHLJJSsjZZloKjyZICDAafhvuoc9OI+mxC2mKdqiQYDN7Bk7boUnIbV20p2T0OZINvXgABBoO/wXX/WHp/WHmln0W380y6ZAeDwft4sMM890ytTc/NqVv9i6sIGAw+HWtebdBuQb7uMlPNfU8wGPwZLz6e+ih1hcFvB+3L4kNgMPgEHPFSJW+q3QJfCc2PC4HB4B2sLdKyeX3x3qBdzGX1zwIMBh+Nv4l/K3LQVGcZY8oAAAAASUVORK5CYII=" />
+      <a class="btn btn-wa" href="https://wa.me/5521974747824?text=Ola!%20Quero%20mais%20informacoes%20sobre%20o%20Sobra.">Clique aqui para mais informacoes</a>
+    </div>
+
+    <div class="preview-wrap">
+      <h2>Como o Sobra aparece no celular</h2>
+      <div class="phone">
+        <div class="app-title">Sobra</div>
+        <div class="app-sub">calculadora de gastos do mes</div>
+        <div class="mnav"><span class="dot">&lt;</span><b>Setembro 2026</b><span class="dot">&gt;</span></div>
+        <div class="sal"><span>SALARIO DO MES</span><div class="box">R$ 0,00</div></div>
+        <div class="sobra">
+          <div>Quanto ainda sobra</div>
+          <div class="val">R$ 0,00</div>
+          <div class="stats">
+            <div class="st">GASTOS<b>R$ 0,00</b></div>
+            <div class="st">JA PAGO<b>R$ 0,00</b></div>
+            <div class="st">A PAGAR<b>R$ 0,00</b></div>
+          </div>
+        </div>
+        <div class="bills">
+          <div class="bh"><span>CONTAS</span><span class="add">+ Nova conta</span></div>
+          <div class="row"><span><i class="sq"></i> Aluguel</span> R$ 0,00</div>
+          <div class="row"><span><i class="sq"></i> Luz</span> R$ 0,00</div>
+        </div>
+      </div>
+      <p class="caption">Foto do layout - salario, sobra e contas do mes</p>
+    </div>
+
+    <div class="access">
+      <p>Role a foto do app aqui dentro. Ela faz parte deste arquivo e nao some ao salvar. O link para guardar no celular vai no WhatsApp depois do Pix.</p>
+      <div class="shot">
+        <div class="phone" style="border-radius:0; box-shadow:none;">
+          <div class="app-title">Sobra</div>
+          <div class="app-sub">calculadora de gastos do mes</div>
+          <div class="mnav"><span class="dot">&lt;</span><b>Setembro 2026</b><span class="dot">&gt;</span></div>
+          <div class="sal"><span>SALARIO DO MES</span><div class="box">R$ 0,00</div></div>
+          <div class="sobra">
+            <div>Quanto ainda sobra</div>
+            <div class="val">R$ 0,00</div>
+            <div class="stats">
+              <div class="st">GASTOS<b>R$ 0,00</b></div>
+              <div class="st">JA PAGO<b>R$ 0,00</b></div>
+              <div class="st">A PAGAR<b>R$ 0,00</b></div>
+            </div>
+          </div>
+          <div class="bills">
+            <div class="bh"><span>CONTAS</span><span class="add">+ Nova conta</span></div>
+            <div class="row"><span><i class="sq"></i> Aluguel</span> R$ 0,00</div>
+            <div class="row"><span><i class="sq"></i> Luz</span> R$ 0,00</div>
+            <div class="row"><span><i class="sq"></i> Internet</span> R$ 0,00</div>
+            <div class="row"><span><i class="sq"></i> Agua</span> R$ 0,00</div>
+            <div class="row"><span><i class="sq"></i> Escola</span> R$ 0,00</div>
+            <div class="row"><span><i class="sq"></i> Passagem</span> R$ 0,00</div>
+            <div class="row"><span><i class="sq"></i> Mercado</span> R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Textos para divulgar</h2>
+      <div class="tabs">
+        <button class="tab on" type="button" data-k="status">Status</button>
+        <button class="tab" type="button" data-k="grupo">Grupo</button>
+        <button class="tab" type="button" data-k="direct">Direct</button>
+        <button class="tab" type="button" data-k="experiencia">Experiencia</button>
+      </div>
+      <textarea id="copybox" readonly></textarea>
+      <button class="btn btn-copy" type="button" id="btncopy">Copiar texto</button>
+
+      <h2 style="margin-top:18px">Frases de organizacao financeira com o Sobra</h2>
+      <div class="phrase">Salario no comeco. Contas no meio. Sobra no fim — se organizar.</div>
+      <div class="phrase">O Sobra nao pergunta onde voce errou. Mostra quanto ainda cabe no mes.</div>
+      <div class="phrase">Verde e controle. Vermelho e aviso. Organizacao financeira no celular.</div>
+      <div class="phrase">Marca o que ja pagou. Ve o que ainda sobra. Esse e o Sobra.</div>
+      <div class="phrase">Organizar o mes nao e planilha. E saber o que ainda sobra do salario.</div>
+
+      <h2 style="margin-top:18px">Experiencias positivas (modelo de conversa)</h2>
+      <p class="note">Modelos para Stories e status — use como exemplo de tom, nao como print real de cliente.</p>
+
+      <div class="wa">
+        <div class="head">Conversa · WhatsApp</div>
+        <div class="bubble left">Menina, aquele app de gasto do mes ajudou demais. Pela primeira vez eu vi a luz e o aluguel juntos antes de gastar.<small>09:12</small></div>
+        <div class="bubble">O Sobra? Valeu demais. R$ 9,99 e o mes inteiro no celular.<small>09:14</small></div>
+      </div>
+      <div class="wa">
+        <div class="head">Conversa · WhatsApp</div>
+        <div class="bubble left">Obrigada. Passei o mes no verde. Marquei o que ja tinha pago e parou aquele aperto de sexta.<small>18:41</small></div>
+        <div class="bubble">Isso. Organizacao financeira e ver o que ainda sobra.<small>18:43</small></div>
+      </div>
+      <div class="wa">
+        <div class="head">Conversa · WhatsApp</div>
+        <div class="bubble left">Mandei pra minha irma. Ela tava no vermelho e nem sabia. Agora as contas da casa estao num lugar so.<small>21:05</small></div>
+        <div class="bubble">Perfeito. O Sobra e isso: salario, contas, quanto ainda sobra.<small>21:07</small></div>
+      </div>
+    </div>
+
+    <section class="info">
+      <h3>Controle financeiro comeca no salario do mes</h3>
+      <p>Organizacao financeira nao e planilha infinita. E saber, com o dinheiro que entrou, o que ja foi pago e o que ainda precisa sair. O Sobra foi feito para essa pergunta do dia a dia: quanto ainda sobra?</p>
+      <h3>Verde quando o mes cabe. Vermelho quando passou.</h3>
+      <p>Voce informa o salario e marca as contas. Se o que foi marcado ainda cabe no valor que entrou, o cartao fica verde. Se estourou, fica vermelho. E o controle visual do orcamento, sem login, no proprio celular.</p>
+      <h3>Um lugar so para as contas da casa</h3>
+      <p>Aluguel, luz, internet, passagem, escola. Em vez de anotar no bloco e esquecer, o mes inteiro fica junto. Organizacao financeira e isso: ver o compromisso antes dele virar aperto no fim do mes.</p>
+      <h3>Como receber o app</h3>
+      <p>O pagamento e R$ 9,99 no QR Pix desta pagina. Depois use o botao Clique aqui para mais informacoes. O contato e so pelo WhatsApp. Nessa conversa voce envia o comprovante e recebe o link do Sobra.</p>
+    </section>
+  </div>
+  <div class="toast" id="toast">Copiado</div>
+  <script>
+    var TEXTS = {
+      status: "NO VERMELHO no fim do mes?\n\nOrganizacao financeira no celular.\nO Sobra mostra quanto AINDA RESTA do salario.\nVerde = sobrou. Vermelho = estourou.\n\nR$ 9,99 no QR Pix.\nClique aqui para mais informacoes:\nhttps://wa.me/5521974747824",
+      grupo: "Quem quer controle do salario este mes:\n\nO Sobra junta as contas da casa e mostra o que ainda sobra.\nOrganizacao financeira simples, no celular.\n\nR$ 9,99 no QR Pix.\nClique aqui para mais informacoes:\nhttps://wa.me/5521974747824",
+      direct: "Oi! O Sobra e o app de controle financeiro do mes.\nR$ 9,99 no QR Pix.\nClique aqui para mais informacoes:\nhttps://wa.me/5521974747824",
+      experiencia: "Experiencia com o Sobra:\n\nPassei o mes vendo o que ainda sobrava do salario.\nMarquei aluguel e luz no mesmo lugar.\nVerde quando coube. Vermelho quando passou.\n\nOrganizacao financeira simples no celular.\nR$ 9,99.\nClique aqui para mais informacoes:\nhttps://wa.me/5521974747824"
+    };
+    var box = document.getElementById("copybox");
+    box.value = TEXTS.status;
+    document.querySelectorAll(".tab").forEach(function(tab){
+      tab.addEventListener("click", function(){
+        document.querySelectorAll(".tab").forEach(function(t){ t.classList.remove("on"); });
+        tab.classList.add("on");
+        box.value = TEXTS[tab.getAttribute("data-k")];
+      });
+    });
+    function toast(m){
+      var t = document.getElementById("toast");
+      t.textContent = m;
+      t.classList.add("show");
+      clearTimeout(window.__tt);
+      window.__tt = setTimeout(function(){ t.classList.remove("show"); }, 1800);
+    }
+    document.getElementById("btncopy").addEventListener("click", function(){
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(box.value).then(function(){ toast("Texto copiado"); });
+      } else {
+        box.select();
+        document.execCommand("copy");
+        toast("Texto copiado");
+      }
+    });
+  </script>
+</body>
+</html>
