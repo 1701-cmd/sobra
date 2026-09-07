@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#0f766e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Sobra" />
   <meta name="description" content="Sobra — calculadora de gastos do mês em reais. Acompanhe salário, contas e quanto ainda sobra." />
   <title>Sobra — calculadora de gastos do mês</title>
   <style>
@@ -650,7 +653,7 @@
     let data = {};
     let editingId = null;
 
-    const STORAGE_KEY = "sobra_data_v1";
+    const STORAGE_KEY = "sobra_data_v2";
 
     function loadData() {
       try {
