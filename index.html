@@ -2,13 +2,17 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0f766e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="Sobra" />
   <meta name="description" content="Sobra — calculadora de gastos do mês em reais. Acompanhe salário, contas e quanto ainda sobra." />
   <title>Sobra — calculadora de gastos do mês</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="icon" href="icon-192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
   <style>
     :root {
       --bg: #f0fdfa;
@@ -17,12 +21,15 @@
       --primary-dark: #0d9488;
       --primary-light: #ccfbf1;
       --text: #134e4a;
-      --text-muted: #5eead4;
       --danger: #dc2626;
       --success: #059669;
       --border: #99f6e4;
       --shadow: 0 4px 20px rgba(15, 118, 110, 0.12);
       --radius: 16px;
+      --pago: #134e4a;
+      --apagar: #d97706;
+      --sobra: #a7f3d0;
+      --estouro: #ef4444;
     }
 
     * {
@@ -49,21 +56,35 @@
 
     header {
       text-align: center;
-      padding: 24px 0 8px;
+      padding: 20px 0 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
     }
 
     header h1 {
       font-size: 2rem;
       font-weight: 800;
       color: var(--primary);
-      letter-spacing: -0.5px;
+      letter-spacing: -0.6px;
+      line-height: 1;
     }
 
     header p {
       font-size: 0.9rem;
       color: #0f766e;
       opacity: 0.8;
-      margin-top: 4px;
+      margin-top: 8px;
     }
 
     .month-nav {
@@ -90,12 +111,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background 0.2s;
     }
 
-    .month-nav button:active {
-      background: #99f6e4;
-    }
+    .month-nav button:active { background: #99f6e4; }
 
     .month-label {
       font-weight: 700;
@@ -143,41 +161,34 @@
       outline: none;
       color: var(--text);
       background: #f0fdfa;
-      transition: border-color 0.2s;
     }
 
-    .salary-input input:focus {
-      border-color: var(--primary);
-    }
+    .salary-input input:focus { border-color: var(--primary); }
 
     .sobra-box {
-      text-align: center;
-      padding: 24px 16px;
+      text-align: left;
+      padding: 20px 16px 16px;
       background: linear-gradient(135deg, #0f766e, #14b8a6);
       color: white;
       border-radius: var(--radius);
       margin-bottom: 16px;
       box-shadow: 0 8px 30px rgba(15, 118, 110, 0.3);
-      transition: background 0.25s ease, box-shadow 0.25s ease;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
     .sobra-box .label {
       font-size: 0.95rem;
-      opacity: 0.9;
-      margin-bottom: 4px;
-    }
-
-    .sobra-box .hint {
-      font-size: 0.75rem;
-      opacity: 0.85;
-      margin-top: 6px;
+      opacity: 0.95;
+      font-weight: 600;
     }
 
     .sobra-box .value {
-      font-size: 2.8rem;
+      font-size: 2.5rem;
       font-weight: 800;
       letter-spacing: -1px;
-      line-height: 1.1;
+      line-height: 1.15;
+      margin: 4px 0 14px;
     }
 
     .sobra-box.positive {
@@ -194,11 +205,57 @@
       background: linear-gradient(135deg, #0f766e, #14b8a6);
     }
 
+    .bar-wrap { margin-top: 4px; }
+
+    .stack-bar {
+      display: flex;
+      width: 100%;
+      height: 52px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.18);
+    }
+
+    .stack-seg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      padding: 0 4px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: center;
+      color: white;
+    }
+
+    .stack-seg span { opacity: 0.9; font-weight: 600; font-size: 0.62rem; }
+    .stack-seg.pago { background: #0b3b36; }
+    .stack-seg.apagar { background: #d97706; color: #1c1917; }
+    .stack-seg.sobra { background: #a7f3d0; color: #064e3b; }
+    .stack-seg.estouro { background: #ef4444; }
+
+    .salary-tick {
+      margin-top: 6px;
+      font-size: 0.72rem;
+      opacity: 0.9;
+      text-align: right;
+    }
+
+    .hint-pill {
+      margin-top: 10px;
+      background: rgba(0,0,0,0.18);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+    }
+
     .stats {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 10px;
-      margin-top: 16px;
+      margin-top: 14px;
     }
 
     .stat {
@@ -215,7 +272,7 @@
     }
 
     .stat .stat-value {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 700;
       margin-top: 2px;
     }
@@ -227,9 +284,7 @@
       margin-bottom: 12px;
     }
 
-    .bills-header .card-title {
-      margin-bottom: 0;
-    }
+    .bills-header .card-title { margin-bottom: 0; }
 
     .btn-add {
       background: var(--primary);
@@ -240,14 +295,9 @@
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
     }
 
-    .btn-add:active {
-      background: var(--primary-dark);
-    }
+    .btn-add:active { background: var(--primary-dark); }
 
     .bills-help {
       font-size: 0.78rem;
@@ -265,18 +315,9 @@
       border-bottom: 1px solid #e0f2f1;
     }
 
-    .bill-item:last-child {
-      border-bottom: none;
-    }
-
-    .bill-item.paid .bill-name {
-      text-decoration: line-through;
-      opacity: 0.6;
-    }
-
-    .bill-item.paid .bill-value {
-      opacity: 0.6;
-    }
+    .bill-item:last-child { border-bottom: none; }
+    .bill-item.paid .bill-name,
+    .bill-item.paid .bill-value { text-decoration: line-through; opacity: 0.6; }
 
     .checkbox {
       width: 24px;
@@ -289,7 +330,6 @@
       justify-content: center;
       background: white;
       flex-shrink: 0;
-      transition: all 0.15s;
     }
 
     .checkbox.checked {
@@ -302,10 +342,6 @@
       color: white;
       font-size: 14px;
       font-weight: 700;
-    }
-
-    .bill-info {
-      min-width: 0;
     }
 
     .bill-name {
@@ -323,10 +359,7 @@
       white-space: nowrap;
     }
 
-    .bill-actions {
-      display: flex;
-      gap: 4px;
-    }
+    .bill-actions { display: flex; gap: 4px; }
 
     .btn-icon {
       background: none;
@@ -336,15 +369,10 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       color: #64748b;
     }
 
-    .btn-icon:active {
-      background: #f1f5f9;
-    }
+    .btn-icon:active { background: #f1f5f9; }
 
     .empty-bills {
       text-align: center;
@@ -370,18 +398,10 @@
       color: var(--primary);
       cursor: pointer;
       text-align: center;
-      transition: all 0.15s;
     }
 
-    .btn-action:active {
-      background: var(--primary-light);
-    }
-
-    .btn-action span {
-      display: block;
-      font-size: 1.3rem;
-      margin-bottom: 2px;
-    }
+    .btn-action:active { background: var(--primary-light); }
+    .btn-action span { display: block; font-size: 1.3rem; margin-bottom: 2px; }
 
     .modal-overlay {
       position: fixed;
@@ -394,9 +414,7 @@
       padding: 16px;
     }
 
-    .modal-overlay.open {
-      display: flex;
-    }
+    .modal-overlay.open { display: flex; }
 
     .modal {
       background: white;
@@ -404,12 +422,6 @@
       width: 100%;
       max-width: 420px;
       padding: 24px;
-      animation: slideUp 0.25s ease;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
     }
 
     .modal h3 {
@@ -418,16 +430,13 @@
       color: var(--primary);
     }
 
-    .form-group {
-      margin-bottom: 14px;
-    }
+    .form-group { margin-bottom: 14px; }
 
     .form-group label {
       display: block;
       font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 6px;
-      color: var(--text);
     }
 
     .form-group input {
@@ -439,9 +448,7 @@
       outline: none;
     }
 
-    .form-group input:focus {
-      border-color: var(--primary);
-    }
+    .form-group input:focus { border-color: var(--primary); }
 
     .modal-actions {
       display: flex;
@@ -459,19 +466,8 @@
       cursor: pointer;
     }
 
-    .btn-cancel {
-      background: #f1f5f9;
-      color: #64748b;
-    }
-
-    .btn-save {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-save:active {
-      background: var(--primary-dark);
-    }
+    .btn-cancel { background: #f1f5f9; color: #64748b; }
+    .btn-save { background: var(--primary); color: white; }
 
     .toast {
       position: fixed;
@@ -503,21 +499,47 @@
       opacity: 0.75;
     }
 
+    .print-only { display: none; }
+
     @media print {
-      body { background: white; }
-      .month-nav button, .btn-add, .bill-actions, .actions, .tip, .modal-overlay, .toast, .bills-help {
+      @page { margin: 10mm; size: A4; }
+      html, body { background: white !important; }
+      .month-nav button,
+      .btn-add,
+      .bill-actions,
+      .actions,
+      .tip,
+      .modal-overlay,
+      .toast,
+      .bills-help,
+      .salary-input input,
+      .no-print {
         display: none !important;
       }
-      .container { max-width: 100%; }
-      .sobra-box { box-shadow: none; }
-      .card { box-shadow: none; border: 1px solid #ddd; }
+      .print-only { display: block !important; }
+      .container { max-width: 100%; padding: 0; }
+      .sobra-box, .card, .stat, .stack-seg, .hint-pill {
+        box-shadow: none;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .card { border: 1px solid #ddd; break-inside: avoid; }
+      .sobra-box { break-inside: avoid; }
+      .bill-item { break-inside: avoid; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Sobra</h1>
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true">
+          <rect width="512" height="512" rx="118" fill="#0f766e"/>
+          <circle cx="256" cy="256" r="172" fill="#ffffff"/>
+          <path d="M256 256 L 406.8 196.2 A 172 172 0 0 1 314.8 416.6 Z" fill="#2dd4bf"/>
+        </svg>
+        <h1>Sobra</h1>
+      </div>
       <p>calculadora de gastos do mês</p>
     </header>
 
@@ -532,13 +554,18 @@
       <div class="salary-input">
         <span>R$</span>
         <input type="number" id="salary" placeholder="0,00" min="0" step="0.01" inputmode="decimal" />
+        <div class="print-only" id="salary-print" style="font-size:1.5rem;font-weight:700;">R$ 0,00</div>
       </div>
     </div>
 
     <div class="sobra-box neutral" id="sobra-box">
-      <div class="label">Quanto ainda sobra</div>
+      <div class="label" id="sobra-label">Quanto ainda sobra</div>
       <div class="value" id="sobra-value">R$ 0,00</div>
-      <div class="hint" id="sobra-hint">Marque as contas para descontar do salário</div>
+      <div class="bar-wrap">
+        <div class="stack-bar" id="stack-bar"></div>
+        <div class="salary-tick" id="salary-tick"></div>
+      </div>
+      <div class="hint-pill" id="sobra-hint">Informe o salário e marque as contas pagas</div>
       <div class="stats">
         <div class="stat">
           <div class="stat-label">Gastos</div>
@@ -549,7 +576,7 @@
           <div class="stat-value" id="stat-pago">R$ 0</div>
         </div>
         <div class="stat">
-          <div class="stat-label">A pagar</div>
+          <div class="stat-label" id="stat-third-label">A pagar</div>
           <div class="stat-value" id="stat-apagar">R$ 0</div>
         </div>
       </div>
@@ -573,13 +600,9 @@
         <span>📋</span>
         Baixar lista
       </button>
-      <button class="btn-action" id="btn-planilha">
-        <span>📊</span>
-        Baixar planilha
-      </button>
-      <button class="btn-action" id="btn-pdf" style="grid-column: 1 / -1;">
+      <button class="btn-action" id="btn-pdf">
         <span>📄</span>
-        Salvar PDF
+        Baixar PDF
       </button>
     </div>
 
@@ -713,7 +736,75 @@
       const totalPago = md.bills.filter(b => b.paid).reduce((s, b) => s + (Number(b.value) || 0), 0);
       const totalAPagar = totalGastos - totalPago;
       const sobra = salary - totalPago;
-      return { salary, totalGastos, totalPago, totalAPagar, sobra };
+      const projetada = salary - totalGastos;
+      const excedeu = Math.max(0, totalGastos - salary);
+      return { salary, totalGastos, totalPago, totalAPagar, sobra, projetada, excedeu };
+    }
+
+    function blocksFor(value, total, cells) {
+      if (value <= 0) return 0;
+      return Math.max(1, Math.round((value / total) * cells));
+    }
+
+    function barLine(label, count, emptyCount) {
+      const block = "█";
+      const empty = "░";
+      const bar = block.repeat(count) + empty.repeat(Math.max(emptyCount, 0));
+      return `${label}${bar || empty.repeat(2)}`;
+    }
+
+    function asciiBar(pago, apagar, resto, negative) {
+      const cells = 12;
+      const total = Math.max(pago + apagar + Math.abs(resto), 1);
+      const p = blocksFor(pago, total, cells);
+      const a = blocksFor(apagar, total, cells);
+      const r = blocksFor(Math.abs(resto), total, cells);
+      const last = negative ? "Estouro " : "Sobra   ";
+      return [
+        barLine("Pago    ", p, cells - p),
+        barLine("A pagar ", a, cells - a),
+        barLine(last, r, cells - r)
+      ].join("\n");
+    }
+
+    function renderBar(c) {
+      const el = document.getElementById("stack-bar");
+      const tick = document.getElementById("salary-tick");
+      const { salary, totalPago, totalAPagar, totalGastos, projetada, excedeu } = c;
+
+      if (salary <= 0 && totalGastos <= 0) {
+        el.innerHTML = "";
+        tick.textContent = "";
+        return;
+      }
+
+      const over = totalGastos > salary && salary > 0;
+      const denom = Math.max(salary, totalGastos, 1);
+      const segs = [];
+
+      const pct = (v) => Math.max(v > 0 ? (v / denom) * 100 : 0, 0);
+
+      if (totalPago > 0) {
+        segs.push({ cls: "pago", label: "Já pago", val: totalPago, w: pct(totalPago) });
+      }
+      if (totalAPagar > 0) {
+        segs.push({ cls: "apagar", label: "A pagar", val: totalAPagar, w: pct(totalAPagar) });
+      }
+      if (over) {
+        segs.push({ cls: "estouro", label: "a mais", val: excedeu, w: Math.max(pct(excedeu), 12) });
+      } else if (projetada > 0) {
+        segs.push({ cls: "sobra", label: "Sobra", val: projetada, w: pct(projetada) });
+      }
+
+      const sumW = segs.reduce((s, x) => s + x.w, 0) || 1;
+      el.innerHTML = segs.map(s => {
+        const w = (s.w / sumW) * 100;
+        const showText = w >= 16;
+        const extra = s.cls === "estouro" ? `<span>excedeu o salário</span>` : `<span>${formatBRL(s.val)}</span>`;
+        return `<div class="stack-seg ${s.cls}" style="width:${w}%">${showText ? `${s.label}${extra}` : ""}</div>`;
+      }).join("");
+
+      tick.textContent = salary > 0 ? `do salário de ${formatBRL(salary)}` : "";
     }
 
     function render() {
@@ -727,31 +818,58 @@
       if (document.activeElement !== salaryInput) {
         salaryInput.value = md.salary ? md.salary : "";
       }
+      const salaryPrint = document.getElementById("salary-print");
+      if (salaryPrint) salaryPrint.textContent = formatBRL(md.salary);
 
-      const { salary, totalGastos, totalPago, totalAPagar, sobra } = calcMonth(md);
+      const c = calcMonth(md);
+      const { salary, totalGastos, totalPago, totalAPagar, sobra, projetada, excedeu } = c;
 
       const sobraBox = document.getElementById("sobra-box");
       const sobraEl = document.getElementById("sobra-value");
+      const labelEl = document.getElementById("sobra-label");
       const hintEl = document.getElementById("sobra-hint");
-      sobraEl.textContent = formatBRL(sobra);
+      const thirdLabel = document.getElementById("stat-third-label");
+      const thirdVal = document.getElementById("stat-apagar");
 
       sobraBox.classList.remove("positive", "negative", "neutral");
-      if (sobra > 0) {
+
+      if (salary > 0 && totalGastos > salary) {
+        sobraBox.classList.add("negative");
+        labelEl.textContent = "Passou do salário";
+        sobraEl.textContent = formatBRL(-excedeu);
+        hintEl.textContent = "as contas do mês passaram do salário";
+        thirdLabel.textContent = "Excedeu";
+        thirdVal.textContent = formatBRL(excedeu);
+      } else if (sobra > 0) {
         sobraBox.classList.add("positive");
-        hintEl.textContent = "Sobra positiva — ainda tem mais que o gasto marcado";
+        labelEl.textContent = "Quanto ainda sobra";
+        sobraEl.textContent = formatBRL(sobra);
+        hintEl.textContent = projetada >= 0
+          ? "depois do que já pagou — se pagar o resto ainda sobra " + formatBRL(projetada)
+          : "depois do que já pagou";
+        thirdLabel.textContent = "A pagar";
+        thirdVal.textContent = formatBRL(totalAPagar);
       } else if (sobra < 0) {
         sobraBox.classList.add("negative");
-        hintEl.textContent = "Valor negativo — os gastos marcados passaram do salário";
+        labelEl.textContent = "Passou do salário";
+        sobraEl.textContent = formatBRL(sobra);
+        hintEl.textContent = "as contas marcadas passaram do salário";
+        thirdLabel.textContent = "Excedeu";
+        thirdVal.textContent = formatBRL(Math.abs(sobra));
       } else {
         sobraBox.classList.add("neutral");
+        labelEl.textContent = "Quanto ainda sobra";
+        sobraEl.textContent = formatBRL(0);
         hintEl.textContent = salary === 0 && totalPago === 0
           ? "Informe o salário e marque as contas pagas"
           : "Zerado em relação ao salário";
+        thirdLabel.textContent = "A pagar";
+        thirdVal.textContent = formatBRL(totalAPagar);
       }
 
       document.getElementById("stat-gastos").textContent = formatBRL(totalGastos);
       document.getElementById("stat-pago").textContent = formatBRL(totalPago);
-      document.getElementById("stat-apagar").textContent = formatBRL(totalAPagar);
+      renderBar(c);
 
       const list = document.getElementById("bills-list");
       if (!md.bills.length) {
@@ -852,8 +970,7 @@
       });
 
       document.getElementById("btn-lista").addEventListener("click", downloadLista);
-      document.getElementById("btn-planilha").addEventListener("click", downloadPlanilha);
-      document.getElementById("btn-pdf").addEventListener("click", savePDF);
+      document.getElementById("btn-pdf").addEventListener("click", downloadPDF);
       document.getElementById("btn-whatsapp").addEventListener("click", sendWhatsApp);
     }
 
@@ -910,8 +1027,35 @@
       return { key, md, ...calcMonth(md) };
     }
 
+    function padMoney(label, value) {
+      return `${label.padEnd(12, " ")}${formatBRL(value)}`;
+    }
+
+    function buildShareText() {
+      const { md, totalPago, totalAPagar, sobra, projetada, excedeu, salary } = getCurrentSummary();
+      const monthName = `${MONTHS_PT[currentMonth]} ${currentYear}`;
+      const negative = salary > 0 && (excedeu > 0 || sobra < 0);
+      const lastLabel = negative ? "Passou" : "Sobra";
+      const lastVal = negative ? (excedeu || Math.abs(sobra)) : sobra;
+
+      let text = `Sobra — ${monthName}\n\n`;
+      text += `${padMoney("Salário", md.salary)}\n`;
+      text += `${padMoney("Já pago", totalPago)}\n`;
+      text += `${padMoney("A pagar", totalAPagar)}\n`;
+      text += `${padMoney(lastLabel, lastVal)}\n\n`;
+      text += asciiBar(totalPago, totalAPagar, negative ? excedeu || Math.abs(sobra) : Math.max(projetada, 0), negative);
+      text += `\n\nContas\n`;
+
+      md.bills.forEach(b => {
+        const mark = b.paid ? "✓" : "○";
+        text += `${mark} ${b.name}    ${formatBRL(b.value)}\n`;
+      });
+
+      return text.trim() + "\n";
+    }
+
     function downloadLista() {
-      const text = buildShareText().replace(/\*/g, "").replace(/_/g, "");
+      const text = buildShareText();
       const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -949,30 +1093,301 @@
       showToast("Planilha baixada");
     }
 
-    function savePDF() {
-      showToast("Use a opção 'Salvar como PDF' na impressão");
-      setTimeout(() => window.print(), 400);
+    function printPage() {
+      try {
+        window.print();
+      } catch (e) {
+        showToast("Impressão indisponível neste aparelho");
+      }
     }
 
-    function buildShareText() {
-      const { md, totalGastos, totalPago, totalAPagar, sobra } = getCurrentSummary();
+    function pdfEscape(str) {
+      return String(str)
+        .replace(/\\/g, "\\\\")
+        .replace(/\(/g, "\\(")
+        .replace(/\)/g, "\\)")
+        .replace(/[^\x20-\x7EÀ-ÿ]/g, "?");
+    }
+
+    function buildSimplePdf() {
+      const { md, salary, totalGastos, totalPago, totalAPagar, sobra, excedeu } = getCurrentSummary();
       const monthName = `${MONTHS_PT[currentMonth]} ${currentYear}`;
+      const over = salary > 0 && totalGastos > salary;
+      const negative = over || sobra < 0;
+      const heroLabel = negative ? "Passou do salario" : "Quanto ainda sobra";
+      const heroVal = negative ? formatBRL(-(excedeu || Math.abs(sobra))) : formatBRL(sobra);
 
-      let text = `*Sobra — ${monthName}*\n\n`;
-      text += `💰 Salário: ${formatBRL(md.salary)}\n`;
-      text += `📉 Gastos: ${formatBRL(totalGastos)}\n`;
-      text += `✅ Já pago: ${formatBRL(totalPago)}\n`;
-      text += `⏳ A pagar: ${formatBRL(totalAPagar)}\n`;
-      text += `✨ *SOBRA: ${formatBRL(sobra)}*\n\n`;
-      text += `*Contas:*\n`;
-
+      const lines = [
+        "Sobra - calculadora de gastos do mes",
+        monthName,
+        "",
+        "Salario: " + formatBRL(salary),
+        "Gastos: " + formatBRL(totalGastos),
+        "Ja pago: " + formatBRL(totalPago),
+        "A pagar: " + formatBRL(totalAPagar),
+        heroLabel + ": " + heroVal,
+        "",
+        "Contas"
+      ];
       md.bills.forEach(b => {
-        const status = b.paid ? "✅" : "⬜";
-        text += `${status} ${b.name}: ${formatBRL(b.value)}\n`;
+        lines.push((b.paid ? "[x] " : "[ ] ") + b.name + "  " + formatBRL(b.value));
+      });
+      lines.push("");
+      lines.push("Gerado pelo app Sobra");
+
+      const contentCmds = ["BT", "/F1 12 Tf", "50 800 Td"];
+      lines.forEach((line, i) => {
+        if (i === 0) contentCmds.push("/F1 16 Tf");
+        if (i === 1) contentCmds.push("/F1 12 Tf");
+        contentCmds.push(`(${pdfEscape(line)}) Tj`);
+        contentCmds.push("0 -18 Td");
+      });
+      contentCmds.push("ET");
+      const stream = contentCmds.join("\n");
+
+      const objects = [];
+      objects.push("<< /Type /Catalog /Pages 2 0 R >>");
+      objects.push("<< /Type /Pages /Kids [3 0 R] /Count 1 >>");
+      objects.push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>");
+      objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+      objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+
+      let pdf = "%PDF-1.4\n";
+      const offsets = [0];
+      objects.forEach((obj, i) => {
+        offsets.push(pdf.length);
+        pdf += `${i + 1} 0 obj\n${obj}\nendobj\n`;
+      });
+      const xref = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n`;
+      pdf += "0000000000 65535 f \n";
+      for (let i = 1; i <= objects.length; i++) {
+        pdf += String(offsets[i]).padStart(10, "0") + " 00000 n \n";
+      }
+      pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+      return new Blob([pdf], { type: "application/pdf" });
+    }
+
+    async function openPdfBlob(blob, filename) {
+      const file = new File([blob], filename, { type: "application/pdf" });
+
+      if (navigator.share && navigator.canShare) {
+        try {
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: filename, text: "Sobra" });
+            showToast("PDF pronto para salvar");
+            return;
+          }
+        } catch (e) {
+          if (e && e.name === "AbortError") return;
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.rel = "noopener";
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => {
+        window.open(url, "_blank");
+      }, 200);
+
+      showToast("PDF gerado");
+    }
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        if (window.jspdf && window.jspdf.jsPDF) {
+          resolve();
+          return;
+        }
+        const existing = document.querySelector(`script[data-jspdf="1"]`);
+        if (existing) {
+          existing.addEventListener("load", () => resolve());
+          existing.addEventListener("error", () => reject(new Error("jspdf")));
+          return;
+        }
+        const s = document.createElement("script");
+        s.src = src;
+        s.async = true;
+        s.dataset.jspdf = "1";
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Falha ao carregar " + src));
+        document.head.appendChild(s);
+      });
+    }
+
+    async function downloadPDF() {
+      const filename = `sobra-${monthKey(currentYear, currentMonth)}.pdf`;
+      showToast("Gerando PDF…");
+
+      try {
+        await loadScript("https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+      } catch (e) {
+        await openPdfBlob(buildSimplePdf(), filename);
+        return;
+      }
+
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        await openPdfBlob(buildSimplePdf(), filename);
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      let filenameDone = filename;
+      try {
+      const { md, salary, totalGastos, totalPago, totalAPagar, sobra, projetada, excedeu } = getCurrentSummary();
+      const monthName = `${MONTHS_PT[currentMonth]} ${currentYear}`;
+      const over = salary > 0 && totalGastos > salary;
+      const negative = over || sobra < 0;
+
+      const doc = new jsPDF({ unit: "mm", format: "a4" });
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 16;
+      const contentW = pageW - margin * 2;
+      let y = 18;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(22);
+      doc.setTextColor(15, 118, 110);
+      doc.text("Sobra", margin, y);
+      y += 7;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(11);
+      doc.setTextColor(15, 118, 110);
+      doc.text("calculadora de gastos do mês", margin, y);
+      y += 8;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(13);
+      doc.setTextColor(19, 78, 74);
+      doc.text(monthName, margin, y);
+      y += 10;
+
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(153, 246, 228);
+      doc.roundedRect(margin, y, contentW, 16, 3, 3, "S");
+      doc.setFontSize(8);
+      doc.setTextColor(15, 118, 110);
+      doc.text("SALÁRIO DO MÊS", margin + 4, y + 6);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(16);
+      doc.setTextColor(19, 78, 74);
+      doc.text(formatBRL(salary), margin + 4, y + 13);
+      y += 20;
+
+      const cardH = 62;
+      if (negative) doc.setFillColor(185, 28, 28);
+      else if (sobra > 0) doc.setFillColor(4, 120, 87);
+      else doc.setFillColor(15, 118, 110);
+      doc.roundedRect(margin, y, contentW, cardH, 4, 4, "F");
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      const heroLabel = negative ? "Passou do salário" : "Quanto ainda sobra";
+      const heroVal = negative ? formatBRL(-(excedeu || Math.abs(sobra))) : formatBRL(sobra);
+      doc.text(heroLabel, margin + 5, y + 8);
+      doc.setFontSize(22);
+      doc.text(heroVal, margin + 5, y + 18);
+
+      const barX = margin + 5;
+      const barY = y + 24;
+      const barW = contentW - 10;
+      const barH = 10;
+      doc.setFillColor(255, 255, 255);
+      doc.setGState && doc.setGState(new doc.GState({ opacity: 0.2 }));
+      doc.roundedRect(barX, barY, barW, barH, 2, 2, "F");
+      if (doc.setGState) doc.setGState(new doc.GState({ opacity: 1 }));
+
+      const denom = Math.max(salary, totalGastos, 1);
+      let xSeg = barX;
+      const segs = [];
+      if (totalPago > 0) segs.push({ w: totalPago / denom, c: [11, 59, 54], t: "Já pago" });
+      if (totalAPagar > 0) segs.push({ w: totalAPagar / denom, c: [217, 119, 6], t: "A pagar" });
+      if (over && excedeu > 0) segs.push({ w: Math.max(excedeu / denom, 0.08), c: [239, 68, 68], t: "a mais" });
+      else if (projetada > 0) segs.push({ w: projetada / denom, c: [167, 243, 208], t: "Sobra" });
+      const sumW = segs.reduce((s, s2) => s + s2.w, 0) || 1;
+      segs.forEach(s => {
+        const w = (s.w / sumW) * barW;
+        doc.setFillColor(s.c[0], s.c[1], s.c[2]);
+        doc.rect(xSeg, barY, w, barH, "F");
+        xSeg += w;
       });
 
-      text += `\n_Gerado pelo app Sobra_`;
-      return text;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(255, 255, 255);
+      doc.text("do salário de " + formatBRL(salary), margin + 5, y + 40);
+
+      const chipW = (contentW - 16) / 3;
+      const chipY = y + 44;
+      const chips = [
+        ["Gastos", formatBRL(totalGastos)],
+        ["Já pago", formatBRL(totalPago)],
+        [negative ? "Excedeu" : "A pagar", formatBRL(negative ? (excedeu || Math.abs(sobra)) : totalAPagar)]
+      ];
+      chips.forEach((ch, i) => {
+        const cx = margin + 5 + i * (chipW + 3);
+        doc.setFillColor(255, 255, 255);
+        if (doc.setGState) doc.setGState(new doc.GState({ opacity: 0.18 }));
+        doc.roundedRect(cx, chipY, chipW, 14, 2, 2, "F");
+        if (doc.setGState) doc.setGState(new doc.GState({ opacity: 1 }));
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(7);
+        doc.text(ch[0].toUpperCase(), cx + 3, chipY + 5);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text(ch[1], cx + 3, chipY + 11);
+        doc.setFont("helvetica", "normal");
+      });
+
+      y += cardH + 10;
+
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.setTextColor(15, 118, 110);
+      doc.text("CONTAS", margin, y);
+      y += 3;
+      doc.setDrawColor(224, 242, 241);
+      doc.setLineWidth(0.3);
+
+      md.bills.forEach(b => {
+        if (y > 280) {
+          doc.addPage();
+          y = 18;
+        }
+        y += 8;
+        doc.line(margin, y + 2, margin + contentW, y + 2);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(19, 78, 74);
+        const mark = b.paid ? "Paga" : "A pagar";
+        doc.text(`${b.paid ? "[x]" : "[ ]"}  ${b.name}`, margin, y);
+        doc.setFont("helvetica", "bold");
+        doc.text(formatBRL(b.value), margin + contentW, y, { align: "right" });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(100, 116, 139);
+        doc.text(mark, margin + contentW * 0.62, y);
+      });
+
+      y += 14;
+      doc.setFontSize(8);
+      doc.setTextColor(15, 118, 110);
+      doc.text("Gerado pelo app Sobra", margin, Math.min(y, 287));
+
+      const blob = doc.output("blob");
+      await openPdfBlob(blob, filenameDone);
+      } catch (err) {
+        console.error(err);
+        await openPdfBlob(buildSimplePdf(), filenameDone);
+      }
     }
 
     function sendWhatsApp() {
