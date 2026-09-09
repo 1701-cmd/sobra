@@ -319,6 +319,39 @@
     .bill-item.paid .bill-name,
     .bill-item.paid .bill-value { text-decoration: line-through; opacity: 0.6; }
 
+    .bill-item.overdue .bill-name,
+    .bill-item.overdue .bill-value,
+    .bill-item.overdue .bill-meta {
+      color: var(--danger);
+    }
+
+    .bill-item.overdue .bill-value { font-weight: 800; }
+
+    .bill-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #f0fdfa;
+      color: var(--primary);
+    }
+
+    .tag.fixa { background: var(--primary); color: white; }
+    .tag.fatura { background: #fff7ed; color: #c2410c; }
+    .tag.variavel { background: #f1f5f9; color: #475569; }
+    .tag.dia { background: #f0fdfa; color: var(--primary); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .tag.atrasada { background: #fef2f2; color: var(--danger); text-transform: none; letter-spacing: 0; }
+    .tag.breve { background: transparent; color: var(--danger); padding: 2px 0; text-transform: none; letter-spacing: 0; font-weight: 700; }
+
     .checkbox {
       width: 24px;
       height: 24px;
@@ -449,6 +482,29 @@
     }
 
     .form-group input:focus { border-color: var(--primary); }
+
+    .kind-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+    }
+
+    .kind-row button {
+      border: 2px solid var(--border);
+      background: white;
+      border-radius: 12px;
+      padding: 10px 4px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    .kind-row button.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
 
     .modal-actions {
       display: flex;
@@ -620,6 +676,18 @@
         <label for="input-value">Valor (R$)</label>
         <input type="number" id="input-value" placeholder="0,00" min="0" step="0.01" inputmode="decimal" />
       </div>
+      <div class="form-group">
+        <label for="input-due">Vencimento</label>
+        <input type="date" id="input-due" />
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <div class="kind-row" id="kind-row">
+          <button type="button" data-kind="fixa">Fixa</button>
+          <button type="button" data-kind="variavel">Variável</button>
+          <button type="button" data-kind="fatura">Fatura</button>
+        </div>
+      </div>
       <div class="modal-actions">
         <button class="btn-cancel" id="btn-cancel">Cancelar</button>
         <button class="btn-save" id="btn-save">Salvar</button>
@@ -675,6 +743,85 @@
     let currentYear, currentMonth;
     let data = {};
     let editingId = null;
+    let selectedKind = "variavel";
+
+    const KIND_LABEL = { fixa: "Fixa", variavel: "Variável", fatura: "Fatura" };
+
+    function normalizeKind(k) {
+      if (k === "fixa" || k === "fatura" || k === "variavel") return k;
+      return "variavel";
+    }
+
+    function shiftDueToMonth(dueDate, year, month) {
+      if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return "";
+      const day = Number(dueDate.slice(8, 10));
+      const last = new Date(year, month + 1, 0).getDate();
+      const d = Math.min(day || 1, last);
+      return `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    }
+
+    function isOverdue(bill) {
+      if (!bill || bill.paid || !bill.dueDate) return false;
+      const parts = String(bill.dueDate).split("-").map(Number);
+      if (parts.length !== 3 || parts.some(n => !n && n !== 0)) return false;
+      const due = new Date(parts[0], parts[1] - 1, parts[2]);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      due.setHours(0, 0, 0, 0);
+      return due < today;
+    }
+
+    function formatDue(dueDate) {
+      if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return "";
+      const [y, m, d] = dueDate.split("-");
+      return `${d}/${m}`;
+    }
+
+    function dueParts(dueDate) {
+      if (!dueDate || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) return null;
+      const [y, m, d] = dueDate.split("-").map(Number);
+      return { y, m, d };
+    }
+
+    function daysUntilDue(dueDate) {
+      const p = dueParts(dueDate);
+      if (!p) return null;
+      const due = new Date(p.y, p.m - 1, p.d);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      due.setHours(0, 0, 0, 0);
+      return Math.round((due - today) / 86400000);
+    }
+
+    function billDetailText(b) {
+      const bits = [];
+      bits.push(KIND_LABEL[normalizeKind(b.kind)]);
+      const p = dueParts(b.dueDate);
+      if (p) {
+        bits.push(normalizeKind(b.kind) === "fatura" ? `fecha dia ${p.d}` : `vence ${formatDue(b.dueDate)}`);
+      }
+      if (isOverdue(b)) bits.push("atrasada");
+      return bits.join(" · ");
+    }
+
+    function billMetaHtml(b) {
+      const kind = normalizeKind(b.kind);
+      const days = daysUntilDue(b.dueDate);
+      const p = dueParts(b.dueDate);
+      const dayLabel = p
+        ? (kind === "fatura" ? `fecha dia ${p.d}` : `dia ${p.d}`)
+        : "";
+      let status = "";
+      if (!b.paid && days !== null) {
+        if (days < 0) status = `<span class="tag atrasada">Atrasada</span>`;
+        else if (days === 0) status = `<span class="tag breve">vence hoje</span>`;
+        else if (days <= 7) status = `<span class="tag breve">vence em ${days} dia${days > 1 ? "s" : ""}</span>`;
+      }
+      return `
+        <span class="tag ${kind}">${KIND_LABEL[kind]}</span>
+        ${dayLabel ? `<span class="tag dia">${dayLabel}</span>` : ""}
+        ${status}`;
+    }
 
     const STORAGE_KEY = "sobra_data_v2";
 
@@ -710,7 +857,9 @@
               id: uid(),
               name: b.name,
               value: Number(b.value) || 0,
-              paid: false
+              paid: false,
+              kind: normalizeKind(b.kind),
+              dueDate: shiftDueToMonth(b.dueDate, year, month)
             }));
             break;
           }
@@ -722,7 +871,9 @@
             id: uid(),
             name: b.name,
             value: b.value,
-            paid: false
+            paid: false,
+            kind: "fixa",
+            dueDate: ""
           }))
         };
         saveData();
@@ -875,19 +1026,22 @@
       if (!md.bills.length) {
         list.innerHTML = `<div class="empty-bills">Nenhuma conta. Clique em + Nova conta</div>`;
       } else {
-        list.innerHTML = md.bills.map(b => `
-          <div class="bill-item ${b.paid ? "paid" : ""}" data-id="${b.id}">
+        list.innerHTML = md.bills.map(b => {
+          const overdue = isOverdue(b);
+          return `
+          <div class="bill-item ${b.paid ? "paid" : ""} ${overdue ? "overdue" : ""}" data-id="${b.id}">
             <div class="checkbox ${b.paid ? "checked" : ""}" data-action="toggle" title="Marcar como pago"></div>
             <div class="bill-info">
               <div class="bill-name">${escapeHtml(b.name)}</div>
+              <div class="bill-meta">${billMetaHtml(b)}</div>
             </div>
             <div class="bill-value">${formatBRL(b.value)}</div>
             <div class="bill-actions">
               <button class="btn-icon" data-action="edit" title="Editar">✏️</button>
               <button class="btn-icon delete" data-action="delete" title="Excluir">🗑️</button>
             </div>
-          </div>
-        `).join("");
+          </div>`;
+        }).join("");
       }
     }
 
@@ -955,6 +1109,12 @@
         }
       });
 
+      document.getElementById("kind-row").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-kind]");
+        if (!btn) return;
+        setKind(btn.dataset.kind);
+      });
+
       document.getElementById("btn-add").addEventListener("click", () => openModal(null));
       document.getElementById("btn-cancel").addEventListener("click", closeModal);
       document.getElementById("btn-save").addEventListener("click", saveModal);
@@ -974,11 +1134,20 @@
       document.getElementById("btn-whatsapp").addEventListener("click", sendWhatsApp);
     }
 
+    function setKind(kind) {
+      selectedKind = normalizeKind(kind);
+      document.querySelectorAll("#kind-row [data-kind]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.kind === selectedKind);
+      });
+    }
+
     function openModal(bill) {
       editingId = bill ? bill.id : null;
       document.getElementById("modal-title").textContent = bill ? "Editar conta" : "Nova conta";
       document.getElementById("input-name").value = bill ? bill.name : "";
       document.getElementById("input-value").value = bill && bill.value ? bill.value : "";
+      document.getElementById("input-due").value = bill && bill.dueDate ? bill.dueDate : "";
+      setKind(bill && bill.kind ? bill.kind : "variavel");
       document.getElementById("modal").classList.add("open");
       setTimeout(() => document.getElementById("input-name").focus(), 100);
     }
@@ -991,6 +1160,8 @@
     function saveModal() {
       const name = document.getElementById("input-name").value.trim();
       const value = parseFloat(document.getElementById("input-value").value) || 0;
+      const dueDate = document.getElementById("input-due").value || "";
+      const kind = selectedKind;
 
       if (!name) {
         showToast("Digite o nome da conta");
@@ -1005,13 +1176,17 @@
         if (bill) {
           bill.name = name;
           bill.value = value;
+          bill.dueDate = dueDate;
+          bill.kind = kind;
         }
       } else {
         md.bills.push({
           id: uid(),
           name,
           value,
-          paid: false
+          paid: false,
+          dueDate,
+          kind
         });
       }
 
@@ -1048,7 +1223,11 @@
 
       md.bills.forEach(b => {
         const mark = b.paid ? "✓" : "○";
-        text += `${mark} ${b.name}    ${formatBRL(b.value)}\n`;
+        const extra = [
+          KIND_LABEL[normalizeKind(b.kind)],
+          formatDue(b.dueDate) ? (isOverdue(b) ? "atrasada " : "") + formatDue(b.dueDate) : ""
+        ].filter(Boolean).join(" · ");
+        text += `${mark} ${b.name}    ${formatBRL(b.value)}${extra ? "  (" + extra + ")" : ""}\n`;
       });
 
       return text.trim() + "\n";
@@ -1131,6 +1310,7 @@
       ];
       md.bills.forEach(b => {
         lines.push((b.paid ? "[x] " : "[ ] ") + b.name + "  " + formatBRL(b.value));
+        lines.push("    " + billDetailText(b) + (b.paid ? " · paga" : " · a pagar"));
       });
       lines.push("");
       lines.push("Gerado pelo app Sobra");
@@ -1358,23 +1538,30 @@
       doc.setLineWidth(0.3);
 
       md.bills.forEach(b => {
-        if (y > 280) {
+        if (y > 270) {
           doc.addPage();
           y = 18;
         }
-        y += 8;
-        doc.line(margin, y + 2, margin + contentW, y + 2);
+        y += 10;
+        doc.line(margin, y + 5, margin + contentW, y + 5);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(10);
-        doc.setTextColor(19, 78, 74);
-        const mark = b.paid ? "Paga" : "A pagar";
+        const overdue = isOverdue(b);
+        if (overdue) doc.setTextColor(185, 28, 28);
+        else doc.setTextColor(19, 78, 74);
+        const mark = b.paid ? "Paga" : (overdue ? "Atrasada" : "A pagar");
         doc.text(`${b.paid ? "[x]" : "[ ]"}  ${b.name}`, margin, y);
         doc.setFont("helvetica", "bold");
         doc.text(formatBRL(b.value), margin + contentW, y, { align: "right" });
         doc.setFont("helvetica", "normal");
         doc.setFontSize(8);
-        doc.setTextColor(100, 116, 139);
-        doc.text(mark, margin + contentW * 0.62, y);
+        if (overdue) doc.setTextColor(185, 28, 28);
+        else doc.setTextColor(100, 116, 139);
+        doc.text(mark, margin + contentW * 0.58, y);
+        y += 4;
+        doc.setFontSize(8);
+        doc.setTextColor(overdue ? 185 : 15, overdue ? 28 : 118, overdue ? 28 : 110);
+        doc.text(billDetailText(b), margin + 8, y);
       });
 
       y += 14;
