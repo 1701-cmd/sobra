@@ -1610,6 +1610,13 @@
       toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
     }
 
+    function registerServiceWorker() {
+      if (!("serviceWorker" in navigator)) return;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+
     function init() {
       loadData();
       const now = new Date();
@@ -1617,6 +1624,7 @@
       currentMonth = now.getMonth();
       setupEvents();
       render();
+      registerServiceWorker();
     }
 
     init();
