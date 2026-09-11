@@ -15,12 +15,14 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <style>
     :root {
+      color-scheme: light dark;
       --bg: #f0fdfa;
       --card: #ffffff;
       --primary: #0f766e;
       --primary-dark: #0d9488;
       --primary-light: #ccfbf1;
       --text: #134e4a;
+      --muted: #0f766e;
       --danger: #dc2626;
       --success: #059669;
       --border: #99f6e4;
@@ -30,13 +32,92 @@
       --apagar: #d97706;
       --sobra: #a7f3d0;
       --estouro: #ef4444;
+      --input-bg: #f0fdfa;
+      --divider: #e0f2f1;
+      --icon: #64748b;
+      --icon-hover: #f1f5f9;
+      --empty: #94a3b8;
+      --modal: #ffffff;
+      --check-bg: #ffffff;
+      --cancel-bg: #f1f5f9;
+      --cancel-text: #64748b;
+      --nav-active: #99f6e4;
+      --tag-bg: #f0fdfa;
+      --tag-fatura-bg: #fff7ed;
+      --tag-fatura: #c2410c;
+      --tag-var-bg: #f1f5f9;
+      --tag-var: #475569;
+      --tag-late-bg: #fef2f2;
+      --theme-color: #0f766e;
     }
+
+    html[data-theme="dark"] {
+        --bg: #042f2e;
+        --card: #0b3b36;
+        --primary: #2dd4bf;
+        --primary-dark: #14b8a6;
+        --primary-light: #134e4a;
+        --text: #ccfbf1;
+        --muted: #99f6e4;
+        --danger: #f87171;
+        --success: #34d399;
+        --border: #115e59;
+        --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+        --input-bg: #083532;
+        --divider: #115e59;
+        --icon: #94a3b8;
+        --icon-hover: #134e4a;
+        --empty: #64748b;
+        --modal: #0f3d39;
+        --check-bg: #0b3b36;
+        --cancel-bg: #134e4a;
+        --cancel-text: #99f6e4;
+        --nav-active: #115e59;
+        --tag-bg: #134e4a;
+        --tag-fatura-bg: #431407;
+        --tag-fatura: #fdba74;
+        --tag-var-bg: #1e293b;
+        --tag-var: #cbd5e1;
+        --tag-late-bg: #450a0a;
+        --theme-color: #042f2e;
+    }
+
+    .btn-theme {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      opacity: 0.7;
+    }
+    .btn-theme:active { opacity: 1; }
+    .btn-theme svg {
+      width: 22px;
+      height: 22px;
+      display: block;
+    }
+    header { position: relative; }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
     }
 
     body {
@@ -52,6 +133,7 @@
       max-width: 480px;
       margin: 0 auto;
       padding: 16px;
+      position: relative;
     }
 
     header {
@@ -82,7 +164,7 @@
 
     header p {
       font-size: 0.9rem;
-      color: #0f766e;
+      color: var(--muted);
       opacity: 0.8;
       margin-top: 8px;
     }
@@ -113,7 +195,7 @@
       justify-content: center;
     }
 
-    .month-nav button:active { background: #99f6e4; }
+    .month-nav button:active { background: var(--nav-active); }
 
     .month-label {
       font-weight: 700;
@@ -143,6 +225,8 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      min-width: 0;
+      width: 100%;
     }
 
     .salary-input span {
@@ -152,7 +236,10 @@
     }
 
     .salary-input input {
-      flex: 1;
+      flex: 1 1 0;
+      min-width: 0;
+      width: 100%;
+      max-width: 100%;
       font-size: 1.5rem;
       font-weight: 700;
       border: 2px solid var(--border);
@@ -160,7 +247,7 @@
       padding: 12px 14px;
       outline: none;
       color: var(--text);
-      background: #f0fdfa;
+      background: var(--input-bg);
     }
 
     .salary-input input:focus { border-color: var(--primary); }
@@ -301,7 +388,7 @@
 
     .bills-help {
       font-size: 0.78rem;
-      color: #0f766e;
+      color: var(--muted);
       opacity: 0.75;
       margin-bottom: 8px;
     }
@@ -312,7 +399,7 @@
       align-items: center;
       gap: 10px;
       padding: 12px 0;
-      border-bottom: 1px solid #e0f2f1;
+      border-bottom: 1px solid var(--divider);
     }
 
     .bill-item:last-child { border-bottom: none; }
@@ -341,15 +428,15 @@
       text-transform: uppercase;
       padding: 2px 6px;
       border-radius: 999px;
-      background: #f0fdfa;
+      background: var(--tag-bg);
       color: var(--primary);
     }
 
     .tag.fixa { background: var(--primary); color: white; }
-    .tag.fatura { background: #fff7ed; color: #c2410c; }
-    .tag.variavel { background: #f1f5f9; color: #475569; }
-    .tag.dia { background: #f0fdfa; color: var(--primary); font-weight: 600; text-transform: none; letter-spacing: 0; }
-    .tag.atrasada { background: #fef2f2; color: var(--danger); text-transform: none; letter-spacing: 0; }
+    .tag.fatura { background: var(--tag-fatura-bg); color: var(--tag-fatura); }
+    .tag.variavel { background: var(--tag-var-bg); color: var(--tag-var); }
+    .tag.dia { background: var(--tag-bg); color: var(--primary); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .tag.atrasada { background: var(--tag-late-bg); color: var(--danger); text-transform: none; letter-spacing: 0; }
     .tag.breve { background: transparent; color: var(--danger); padding: 2px 0; text-transform: none; letter-spacing: 0; font-weight: 700; }
 
     .checkbox {
@@ -361,7 +448,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: white;
+      background: var(--check-bg);
       flex-shrink: 0;
     }
 
@@ -402,15 +489,15 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
-      color: #64748b;
+      color: var(--icon);
     }
 
-    .btn-icon:active { background: #f1f5f9; }
+    .btn-icon:active { background: var(--icon-hover); }
 
     .empty-bills {
       text-align: center;
       padding: 24px;
-      color: #94a3b8;
+      color: var(--empty);
       font-size: 0.9rem;
     }
 
@@ -450,7 +537,7 @@
     .modal-overlay.open { display: flex; }
 
     .modal {
-      background: white;
+      background: var(--modal);
       border-radius: 20px 20px 16px 16px;
       width: 100%;
       max-width: 420px;
@@ -479,6 +566,8 @@
       border-radius: 12px;
       font-size: 1rem;
       outline: none;
+      background: var(--input-bg);
+      color: var(--text);
     }
 
     .form-group input:focus { border-color: var(--primary); }
@@ -491,7 +580,7 @@
 
     .kind-row button {
       border: 2px solid var(--border);
-      background: white;
+      background: var(--card);
       border-radius: 12px;
       padding: 10px 4px;
       font-size: 0.8rem;
@@ -522,7 +611,7 @@
       cursor: pointer;
     }
 
-    .btn-cancel { background: #f1f5f9; color: #64748b; }
+    .btn-cancel { background: var(--cancel-bg); color: var(--cancel-text); }
     .btn-save { background: var(--primary); color: white; }
 
     .toast {
@@ -550,7 +639,7 @@
     .tip {
       text-align: center;
       font-size: 0.8rem;
-      color: #0f766e;
+      color: var(--muted);
       margin-top: 20px;
       opacity: 0.75;
     }
@@ -561,6 +650,7 @@
       @page { margin: 10mm; size: A4; }
       html, body { background: white !important; }
       .month-nav button,
+      .btn-theme,
       .btn-add,
       .bill-actions,
       .actions,
@@ -586,7 +676,43 @@
   </style>
 </head>
 <body>
+  <script>
+    (function () {
+      var KEY = "sobra_theme";
+      function preferred() {
+        try { var s = localStorage.getItem(KEY); if (s === "dark" || s === "light") return s; } catch (e) {}
+        return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+      }
+      function apply(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute("content", theme === "dark" ? "#042f2e" : "#0f766e");
+        var bar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+        if (bar) bar.setAttribute("content", theme === "dark" ? "black-translucent" : "default");
+        var btn = document.getElementById("btn-theme");
+        if (btn) {
+          btn.setAttribute("aria-label", theme === "dark" ? "Usar tema claro" : "Usar tema escuro");
+          btn.title = theme === "dark" ? "Tema claro" : "Tema escuro";
+        }
+      }
+      apply(preferred());
+      document.addEventListener("DOMContentLoaded", function () { apply(preferred()); });
+      window.__sobraToggleTheme = function () {
+        var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+        try { localStorage.setItem(KEY, next); } catch (e) {}
+        apply(next);
+      };
+    })();
+  </script>
   <div class="container">
+    <button type="button" class="btn-theme" id="btn-theme" aria-label="Alternar tema" onclick="window.__sobraToggleTheme()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"></circle>
+        <circle cx="12" cy="12" r="3.5"></circle>
+        <path d="M12 8.5 A 3.5 3.5 0 0 0 12 15.5 Z" fill="currentColor" stroke="none"></path>
+        <path d="M12 6.55v1.35M8.15 8.15l.95.95M6.55 12h1.35M8.15 15.85l.95-.95"></path>
+      </svg>
+    </button>
     <header>
       <div class="brand">
         <svg class="brand-mark" viewBox="0 0 512 512" aria-hidden="true">
